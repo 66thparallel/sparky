@@ -32,7 +32,9 @@
    - Follow the official ROS 2 installation guide for your OS.
 
 2. Install ROS 2 message/system dependencies (via apt):
+   ```sh
    sudo apt install ros-jazzy-nav-msgs ros-jazzy-geometry-msgs ros-jazzy-ackermann-msgs
+   ```
 
 3. (Optional) Create and activate a Python virtual environment:
    ```sh
@@ -41,13 +43,19 @@
    ```
 
 4. Install Python dependencies:
+   ```sh
    pip install -r requirements.txt
+   ```
 
 5. Build the ROS 2 workspace:
+   ```sh
    colcon build
+   ```
 
 6. Source the workspace setup script:
+   ```sh
    source install/setup.bash
+   ```
 
 7. Run your ROS 2 nodes as needed.
 
