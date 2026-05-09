@@ -35,8 +35,10 @@
    sudo apt install ros-jazzy-nav-msgs ros-jazzy-geometry-msgs ros-jazzy-ackermann-msgs
 
 3. (Optional) Create and activate a Python virtual environment:
+   ```sh
    python3 -m venv venv
    source venv/bin/activate
+   ```
 
 4. Install Python dependencies:
    pip install -r requirements.txt
