@@ -8,4 +8,4 @@ This project creates a simulated vehicle that:
 
 
 ### Side Story
-This project is named after Sparky, Speed Racer’s lead mechanic and one of Speed’s best friends.
+This project is named after Sparky, Speed Racer's lead mechanic and one of Speed's best friends.
