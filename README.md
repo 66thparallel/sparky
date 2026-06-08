@@ -7,5 +7,5 @@ This project creates a simulated vehicle that:
 * logs performance metrics
 
 
-## Side Story
-This project is named after Speed Racer’s lead mechanic and one of Speed’s best friends. Sparky is the only person besides Pops who fully understands the complex systems of the Mach 5 and is often seen making mid-race repairs under extreme pressure.
+### Side Story
+This project is named after Sparky, Speed Racer’s lead mechanic and one of Speed’s best friends.
