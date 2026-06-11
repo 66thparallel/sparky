@@ -3,3 +3,7 @@ install/
 log/
 docs/
 venv/
+
+.vscode/
+
+__pycache__/
