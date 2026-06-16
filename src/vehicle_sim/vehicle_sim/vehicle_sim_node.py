@@ -1,10 +1,11 @@
 import math
 import rclpy
-import tf_transformations
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import TransformStamped
 from tf2_ros import TransformBroadcaster
+from tf2_ros import StaticTransformBroadcaster
+from tf_transformations import quaternion_from_euler
 from nav_msgs.msg import Odometry
 
 
@@ -39,16 +40,36 @@ class VehicleSimNode(Node):
         self.odom_pub = self.create_publisher(Odometry, "/odom", 10)
 
         # initialize TF broadcaster
+        self.static_tf_broadcaster = StaticTransformBroadcaster(self)
         self.tf_broadcaster = TransformBroadcaster(self)
 
         # time tracking (shared by both odom + TF)
         self.last_time = self.get_clock().now()
+
+        # static transform
+        map_tf = TransformStamped()
+
+        map_tf.header.stamp = self.get_clock().now().to_msg()
+        map_tf.header.frame_id = "map"
+        map_tf.child_frame_id = "odom"
+
+        map_tf.transform.translation.x = 0.0
+        map_tf.transform.translation.y = 0.0
+        map_tf.transform.translation.z = 0.0
+
+        map_tf.transform.rotation.x = 0.0
+        map_tf.transform.rotation.y = 0.0
+        map_tf.transform.rotation.z = 0.0
+        map_tf.transform.rotation.w = 1.0
+
+        self.static_tf_broadcaster.sendTransform(map_tf)
 
     def update(self):
         """This is the vehicle simulation. It uses the bicycle kinematic model."""
         # get time
         now = self.get_clock().now()
         dt = (now - self.last_time).nanoseconds * 1e-9
+        if dt <= 0.0: return
         self.last_time = now
 
         # set speed
@@ -66,53 +87,59 @@ class VehicleSimNode(Node):
             * dt
         )
 
-        # add TF publishing
-        t = TransformStamped()
+        # compute odom → base_link
+        odom_tf = TransformStamped()
 
-        t.header.stamp = now.to_msg()
-        t.header.frame_id = "map"
-        t.child_frame_id = "base_link"
+        odom_tf.header.stamp = now.to_msg()
+        odom_tf.header.frame_id = "odom"
+        odom_tf.child_frame_id = "base_link"
 
-        # translation
-        t.transform.translation.x = self.state.x
-        t.transform.translation.y = self.state.y
-        t.transform.translation.z = 0.0
+        odom_tf.transform.translation.x = self.state.x
+        odom_tf.transform.translation.y = self.state.y
+        odom_tf.transform.translation.z = 0.0
 
-        # rotation (yaw → quaternion)
-        q = tf_transformations.quaternion_from_euler(
-            0.0, 0.0, self.state.yaw
-        )
+        # orientation from yaw
+        q = quaternion_from_euler(0.0, 0.0, self.state.yaw)
 
-        t.transform.rotation.x = q[0]
-        t.transform.rotation.y = q[1]
-        t.transform.rotation.z = q[2]
-        t.transform.rotation.w = q[3]
+        odom_tf.transform.rotation.x = q[0]
+        odom_tf.transform.rotation.y = q[1]
+        odom_tf.transform.rotation.z = q[2]
+        odom_tf.transform.rotation.w = q[3]
 
-        self.tf_broadcaster.sendTransform(t)
+        self.tf_broadcaster.sendTransform(odom_tf)
 
-        # publish odometry
+        # publish odometry (odom -> base_link)
         odom = Odometry()
 
-        # timestamp of when this measurement was produced
+        # time stamp
         odom.header.stamp = now.to_msg()
 
-        # position (x, y) is expressed in the map coordinate frame
-        odom.header.frame_id = "map"
-
-        # velocity is describing the vehicle body (base_link)
+        # frame relationship
+        odom.header.frame_id = "odom"
         odom.child_frame_id = "base_link"
+
+        # position in odom frame
         odom.pose.pose.position.x = self.state.x
         odom.pose.pose.position.y = self.state.y
-        odom.twist.twist.linear.x = self.state.velocity
+        odom.pose.pose.position.z = 0.0
 
-        # set the orientation
-        q = tf_transformations.quaternion_from_euler(0.0, 0.0, self.state.yaw)
         odom.pose.pose.orientation.x = q[0]
         odom.pose.pose.orientation.y = q[1]
         odom.pose.pose.orientation.z = q[2]
         odom.pose.pose.orientation.w = q[3]
 
-        # publish the message
+        # velocity in base_link frame
+        odom.twist.twist.linear.x = self.state.velocity
+        odom.twist.twist.linear.y = 0.0
+        odom.twist.twist.linear.z = 0.0
+        odom.twist.twist.angular.x = 0.0
+        odom.twist.twist.angular.y = 0.0
+        odom.twist.twist.angular.z = (
+            self.state.velocity / self.wheelbase *
+            math.tan(self.commanded_steering)
+        )
+
+        # publish
         self.odom_pub.publish(odom)
 
     def cmd_callback(self, msg):
