@@ -17,13 +17,18 @@ Sparky is split into four core ROS 2 nodes:
 - planner/ → (Optional) higher-level route logic
 - controller/ → Pure Pursuit-based path tracking
 
+### System Diagram
+Path Planner → Trajectory → Controller → Vehicle Sim
+                     ↑                         ↓
+                   TF / Odometry  ←────────────
+
 ### Control Approach
 The controller uses a Pure Pursuit algorithm for geometric path tracking, converting waypoint lookahead errors into steering commands.
 
-### Data Flow
-path_generator → planner → controller → vehicle_sim
-                         ↑
-                      TF/odom
+### TF Tree
+map
+ └── odom
+      └── base_link
 
 ### Goals
 - Four main ROS 2 nodes
