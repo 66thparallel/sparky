@@ -1,5 +1,5 @@
 ## Sparky - a ROS 2 Real-Time Trajectory Planning and Vehicle Control Stack
-Sparky is a modular ROS 2 simulation project for testing basic autonomous vehicle behaviors in a simplified environment.
+Sparky is a modular ROS 2 simulation project for testing basic autonomous vehicle behaviors.
 
 ### Overview
 
@@ -7,7 +7,7 @@ The system simulates a vehicle that:
 - Receives a route or waypoint list
 - Generates a smooth trajectory
 - Tracks the trajectory using a feedback controller
-- Visualizes motion in RViz (optional)
+- Visualizes vehicle motion in RViz
 - Logs basic performance metrics for analysis
 
 ### Architecture
