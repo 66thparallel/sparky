@@ -20,7 +20,7 @@ class PathPlannerNode(Node):
         path.header.frame_id = "map"
         path.header.stamp = self.get_clock().now().to_msg()
 
-        # Simple square loop (toy sim friendly)
+        # simple square loop
         waypoints = [
             (0.0, 0.0),
             (2.0, 0.0),
