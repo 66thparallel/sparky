@@ -10,12 +10,12 @@ class ControllerNode(Node):
     def __init__(self):
         super().__init__('controller_node')
 
-        # ===== Parameters (tunable like real systems) =====
+        # tunable parameters
         self.lookahead_dist = 0.8
         self.k_steer = 1.5
         self.max_speed = 1.0
 
-        # ===== ROS I/O =====
+        # ros i/o
         self.pub = self.create_publisher(Twist, '/cmd_drive', 10)
 
         self.create_subscription(Path, '/path', self.path_callback, 10)
@@ -23,7 +23,7 @@ class ControllerNode(Node):
 
         self.timer = self.create_timer(0.1, self.update)
 
-        # ===== State =====
+        # state
         self.path = None
 
         self.x = 0.0
@@ -33,10 +33,7 @@ class ControllerNode(Node):
 
         self.get_logger().info("Pure Pursuit Controller started")
 
-    # ------------------------
-    # Callbacks
-    # ------------------------
-
+    # callbacks
     def path_callback(self, msg):
         self.path = msg
 
@@ -51,10 +48,7 @@ class ControllerNode(Node):
 
         self.odom_ready = True
 
-    # ------------------------
-    # Core control loop
-    # ------------------------
-
+    # core control loop
     def update(self):
         if not self.odom_ready or self.path is None:
             return
@@ -66,7 +60,7 @@ class ControllerNode(Node):
         cmd = self.compute_control(lookahead_point)
         self.pub.publish(cmd)
 
-    # Pure Pursuit
+    # pure pursuit
     def find_lookahead_point(self):
         for pose_stamped in self.path.poses:
             dx = pose_stamped.pose.position.x - self.x
@@ -90,7 +84,7 @@ class ControllerNode(Node):
         alpha = target_angle - self.yaw
         alpha = math.atan2(math.sin(alpha), math.cos(alpha))
 
-        # Pure Pursuit curvature
+        # calculate curvature to waypoint
         curvature = 2.0 * math.sin(alpha) / max(self.lookahead_dist, 0.01)
 
         cmd = Twist()
