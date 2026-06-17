@@ -64,6 +64,19 @@ class VehicleSimNode(Node):
 
         self.static_tf_broadcaster.sendTransform(map_tf)
 
+        # subscribe to controller node's topic /cmd_vel
+        self.subscription = self.create_subscription(
+            Twist,
+            '/cmd_vel',
+            self.cmd_callback,
+            10
+        )
+
+        # add timer-based update loop
+        self.dt = 0.1
+        self.timer = self.create_timer(self.dt, self.update)
+
+
     def update(self):
         """This is the vehicle simulation. It uses the bicycle kinematic model."""
         # get time
@@ -143,12 +156,15 @@ class VehicleSimNode(Node):
         self.odom_pub.publish(odom)
 
     def cmd_callback(self, msg):
-        """Create the callback. Whenever a controller publishes a command, these values update."""
+        """Callback for velocity commands from controller."""
+
         self.commanded_speed = msg.linear.x
         self.commanded_steering = max(-0.6, min(0.6, msg.angular.z))
+
         self.get_logger().info(
-            f"cmd received: speed={self.commanded_speed}, "
-            f"steering={self.commanded_steering}"
+            f"cmd received: speed={self.commanded_speed:.2f}, "
+            f"steering={self.commanded_steering:.2f}, "
+            f"raw: linear.x={msg.linear.x:.2f}, angular.z={msg.angular.z:.2f}"
         )
 
 
