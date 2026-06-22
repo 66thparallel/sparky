@@ -14,33 +14,32 @@
      ros-jazzy-tf2-tools
    ```
 
-2. From the Sparky workspace root, source ROS 2 and build the workspace.
+2. Clone the repository and enter the workspace.
 
    ```sh
-   cd ~/projects/sparky
+   git clone <your-repo-url> sparky
+   cd sparky
+   ```
+
+3. Source ROS 2 and build the workspace.
+
+   ```sh
    source /opt/ros/jazzy/setup.bash
    colcon build --symlink-install
    ```
 
-3. In the same terminal, source the built workspace and launch the full stack with the default route.
+4. In the same terminal, source the built workspace and launch the full stack with the default route.
 
    ```sh
    source install/setup.bash
    ros2 launch path_planner sparky.launch.py
    ```
 
-4. In a second terminal, source ROS 2 and the workspace again, then open RViz with the checked-in config.
+5. In a second terminal, source ROS 2 and the workspace again, then open RViz with the checked-in config.
 
    ```sh
-   cd ~/projects/sparky
+   cd sparky
    source /opt/ros/jazzy/setup.bash
    source install/setup.bash
    rviz2 -d $(ros2 pkg prefix path_planner)/share/path_planner/rviz/sparky.rviz
-   ```
-
-5. If you want to test a different route, keep the same launch file and point it at another YAML route config.
-
-   ```sh
-   ros2 launch path_planner sparky.launch.py \
-     route_config:=/absolute/path/to/your_route.yaml
    ```
