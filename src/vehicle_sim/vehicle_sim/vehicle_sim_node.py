@@ -33,7 +33,7 @@ class VehicleSimNode(Node):
             Twist, "/cmd_drive", self.cmd_callback, 10
         )
 
-        # create the 50 Hz timer (every 20 ms run an update)
+        # update the simulator at 50 Hz
         self.timer = self.create_timer(0.02, self.update)
 
         # create odometry publisher
@@ -63,19 +63,6 @@ class VehicleSimNode(Node):
         map_tf.transform.rotation.w = 1.0
 
         self.static_tf_broadcaster.sendTransform(map_tf)
-
-        # subscribe to controller node's topic /cmd_vel
-        self.subscription = self.create_subscription(
-            Twist,
-            '/cmd_vel',
-            self.cmd_callback,
-            10
-        )
-
-        # add timer-based update loop
-        self.dt = 0.1
-        self.timer = self.create_timer(self.dt, self.update)
-
 
     def update(self):
         """This is the vehicle simulation. It uses the bicycle kinematic model."""
