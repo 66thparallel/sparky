@@ -1,67 +1,46 @@
-# ROS2 Autonomous Vehicle Simulation - Python Dependencies
-
-## Core ROS 2 Python client library
-- rclpy
-
-## Message types
-- nav_msgs
-- geometry_msgs
-- ackermann_msgs
-
-## Numerical computing
-- numpy
-- scipy
-
-## For transforms / kinematics
-- transforms3d
-
-## Visualization helpers (optional)
-- matplotlib
-
-## Optional: trajectory smoothing / splines
-- scikit-learn
-
-## Optional debugging utilities
-- tqdm
-
----
+# Sparky Setup
 
 ## Setup Instructions
 
-1. Install ROS 2 - Jazzy Jalisco:
-   - Follow the official ROS 2 installation guide for your OS.
+1. Install ROS 2 Jazzy Desktop and the runtime tools Sparky uses.
 
-2. Install ROS 2 message/system dependencies (via apt):
    ```sh
-   sudo apt install ros-jazzy-nav-msgs ros-jazzy-geometry-msgs ros-jazzy-ackermann-msgs
+   sudo apt update
+   sudo apt install -y \
+     ros-jazzy-desktop \
+     python3-colcon-common-extensions \
+     ros-jazzy-robot-state-publisher \
+     ros-jazzy-tf-transformations \
+     ros-jazzy-tf2-tools
    ```
 
-3. (Optional) Create and activate a Python virtual environment:
+2. From the Sparky workspace root, source ROS 2 and build the workspace.
+
    ```sh
-   python3 -m venv venv
-   source venv/bin/activate
+   cd ~/projects/sparky
+   source /opt/ros/jazzy/setup.bash
+   colcon build --symlink-install
    ```
 
-4. Install Python dependencies:
-   ```sh
-   pip install -r requirements.txt
-   ```
+3. In the same terminal, source the built workspace and launch the full stack with the default route.
 
-5. Build the ROS 2 workspace:
-   ```sh
-   colcon build
-   ```
-
-6. Source the workspace setup script:
    ```sh
    source install/setup.bash
+   ros2 launch path_planner sparky.launch.py
    ```
 
-7. Run your ROS 2 nodes as needed.
+4. In a second terminal, source ROS 2 and the workspace again, then open RViz with the checked-in config.
 
----
+   ```sh
+   cd ~/projects/sparky
+   source /opt/ros/jazzy/setup.bash
+   source install/setup.bash
+   rviz2 -d $(ros2 pkg prefix path_planner)/share/path_planner/rviz/sparky.rviz
+   ```
 
-### Notes
-- ROS 2 system dependencies (message types) are not installed via pip; use apt as shown above.
-- requirements.txt covers only Python dependencies.
-- Some dependencies (e.g., rclpy) are installed as part of ROS 2, not via pip.
+5. If you want to test a different route, keep the same launch file and point it at another YAML route config.
+
+   ```sh
+   ros2 launch path_planner sparky.launch.py \
+     route_config:=/absolute/path/to/your_route.yaml
+   ```
