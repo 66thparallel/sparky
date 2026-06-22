@@ -5,7 +5,7 @@ Sparky is a ROS 2 simulation workspace for basic autonomous vehicle planning, co
 ## Overview
 
 The current workspace implements a minimum viable closed loop:
-- `path_planner` publishes a fixed `nav_msgs/Path`
+- `path_planner` publishes a configurable `nav_msgs/Path` from waypoint input parameters
 - `controller` tracks that path from `/odom` using a Pure Pursuit-style controller
 - `vehicle_sim` simulates a kinematic bicycle model and publishes odometry plus TF
 - `vehicle_description` provides the URDF asset for visualization
@@ -29,10 +29,52 @@ ros2 run controller controller_node
 ros2 run vehicle_sim vehicle_sim_node
 ```
 
+Use the checked-in YAML route file:
+
+```sh
+ros2 run path_planner path_planner_node --ros-args \
+      --params-file $(ros2 pkg prefix path_planner)/share/path_planner/config/default_route.yaml
+```
+
+Override the planner route from the command line with flattened `x, y` waypoint pairs:
+
+```sh
+ros2 run path_planner path_planner_node --ros-args \
+      -p waypoints:="[0.0, 0.0, 3.0, 0.0, 3.0, 1.5, 0.0, 1.5, 0.0, 0.0]"
+```
+
+Manual RViz visualization works today:
+
+```sh
+rviz2
+ros2 run robot_state_publisher robot_state_publisher \
+      --ros-args \
+      -p robot_description:="$(cat $(ros2 pkg prefix vehicle_description)/share/vehicle_description/urdf/vehicle.urdf)"
+```
+
+Reusable RViz config:
+
+```sh
+rviz2 -d $(ros2 pkg prefix path_planner)/share/path_planner/rviz/sparky.rviz
+```
+
+Launch the stack with the default route file:
+
+```sh
+ros2 launch path_planner sparky.launch.py
+```
+
+Swap routes by pointing launch at another YAML file:
+
+```sh
+ros2 launch path_planner sparky.launch.py \
+      route_config:=/absolute/path/to/your_route.yaml
+```
+
 ## Architecture
 
 Current packages in `src/`:
-- `path_planner`: publishes `/path`
+- `path_planner`: publishes `/path` from configurable waypoint input
 - `controller`: subscribes to `/path` and `/odom`, publishes `/cmd_drive`
 - `vehicle_sim`: subscribes to `/cmd_drive`, publishes `/odom`, broadcasts TF
 - `vehicle_description`: installs the vehicle URDF asset
@@ -49,9 +91,8 @@ flowchart LR
 
 ## Current Status
 
-- Implemented: path publication, path tracking, kinematic simulation, odometry, and TF
-- Missing: launch files, RViz config, metrics logging, route input, and trajectory smoothing
-- Note: earlier project notes describe a `path_generator` and `planner` split, but the current source tree uses a single `path_planner` package
+- Implemented: configurable path publication, path tracking, kinematic simulation, odometry, TF, manual RViz visualization, and a checked-in RViz config
+- Missing: metrics logging and trajectory smoothing
 
 ## Documentation
 
@@ -62,8 +103,6 @@ flowchart LR
 
 ## Future Work
 
-- Add launch files and an RViz configuration
-- Replace the fixed square path with configurable route input
 - Add trajectory smoothing and velocity profiling
 - Add logging and plots for tracking metrics
 - Clean up package metadata and runtime interfaces
