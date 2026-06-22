@@ -21,8 +21,8 @@ setup(
     zip_safe=True,
     maintainer='janeikeliu',
     maintainer_email='38669412+66thparallel@users.noreply.github.com',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    description='Configurable path publisher and demo launch assets for the Sparky stack.',
+    license='MIT',
     extras_require={
         'test': [
             'pytest',

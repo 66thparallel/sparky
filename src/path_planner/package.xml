@@ -3,9 +3,9 @@
 <package format="3">
   <name>path_planner</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Configurable path publisher and demo launch assets for the Sparky stack.</description>
   <maintainer email="38669412+66thparallel@users.noreply.github.com">janeikeliu</maintainer>
-  <license>TODO: License declaration</license>
+  <license>MIT</license>
 
   <depend>rclpy</depend>
   <depend>nav_msgs</depend>

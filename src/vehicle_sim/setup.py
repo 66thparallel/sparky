@@ -15,8 +15,8 @@ setup(
     zip_safe=True,
     maintainer='janeikeliu',
     maintainer_email='janeikeliu@gmail.com',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    description='Kinematic bicycle vehicle simulator for the Sparky simulation stack.',
+    license='MIT',
     extras_require={
         'test': [
             'pytest',

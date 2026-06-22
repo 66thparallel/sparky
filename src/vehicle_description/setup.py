@@ -19,8 +19,8 @@ setup(
     zip_safe=True,
     maintainer='janeikeliu',
     maintainer_email='38669412+66thparallel@users.noreply.github.com',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    description='URDF and visualization assets for the Sparky vehicle model.',
+    license='MIT',
     extras_require={
         'test': [
             'pytest',
