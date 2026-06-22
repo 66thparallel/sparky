@@ -1,0 +1,14 @@
+path_planner_node:
+  ros__parameters:
+    frame_id: map
+    waypoints:
+      - 0.0
+      - 0.0
+      - 2.0
+      - 0.0
+      - 2.0
+      - 2.0
+      - 0.0
+      - 2.0
+      - 0.0
+      - 0.0
