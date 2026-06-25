@@ -1,8 +1,9 @@
 import rclpy
-from rclpy.node import Node
-
-from nav_msgs.msg import Path
+from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 from geometry_msgs.msg import PoseStamped
+from rclpy.node import Node
+from nav_msgs.msg import Path
+import rclpy
 
 
 class PathPlannerNode(Node):
@@ -16,8 +17,10 @@ class PathPlannerNode(Node):
         )
 
         self.path_pub = self.create_publisher(Path, '/path', 10)
+        self.metrics_pub = self.create_publisher(DiagnosticArray, '/metrics/planner', 10)
         self.frame_id = self.get_parameter('frame_id').value
         self.waypoints = self._load_waypoints()
+        self.previous_publish_time = None
 
         self.timer = self.create_timer(1.0, self.publish_path)
 
@@ -44,9 +47,10 @@ class PathPlannerNode(Node):
         ]
 
     def publish_path(self):
+        publish_time = self.get_clock().now()
         path = Path()
         path.header.frame_id = self.frame_id
-        path.header.stamp = self.get_clock().now().to_msg()
+        path.header.stamp = publish_time.to_msg()
 
         for x, y in self.waypoints:
             pose = PoseStamped()
@@ -62,6 +66,36 @@ class PathPlannerNode(Node):
             path.poses.append(pose)
 
         self.path_pub.publish(path)
+        self.publish_metrics(publish_time)
+
+    def publish_metrics(self, publish_time):
+        publish_interval_ms = 0.0
+        loop_rate_hz = 0.0
+
+        if self.previous_publish_time is not None:
+            publish_interval_ms = (
+                (publish_time - self.previous_publish_time).nanoseconds * 1e-6
+            )
+            if publish_interval_ms > 0.0:
+                loop_rate_hz = 1000.0 / publish_interval_ms
+
+        self.previous_publish_time = publish_time
+
+        metrics_msg = DiagnosticArray()
+        metrics_msg.header.stamp = publish_time.to_msg()
+
+        status = DiagnosticStatus()
+        status.name = 'planner_metrics'
+        status.message = 'planner telemetry'
+        status.values = [
+            KeyValue(key='frame_id', value=str(self.frame_id)),
+            KeyValue(key='waypoint_count', value=str(len(self.waypoints))),
+            KeyValue(key='publish_interval_ms', value=str(publish_interval_ms)),
+            KeyValue(key='loop_rate_hz', value=str(loop_rate_hz)),
+        ]
+
+        metrics_msg.status = [status]
+        self.metrics_pub.publish(metrics_msg)
 
 
 def main(args=None):
