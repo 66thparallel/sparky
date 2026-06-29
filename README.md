@@ -64,11 +64,25 @@ Launch the stack with the default route file:
 ros2 launch path_planner sparky.launch.py
 ```
 
+Launch the stack without the metrics logger:
+
+```sh
+ros2 launch path_planner sparky.launch.py enable_metrics:=false
+```
+
 Swap routes by pointing launch at another YAML file:
 
 ```sh
 ros2 launch path_planner sparky.launch.py \
       route_config:=/absolute/path/to/your_route.yaml
+```
+
+Override the metrics output directory or summary period:
+
+```sh
+ros2 launch path_planner sparky.launch.py \
+      metrics_log_dir:=/absolute/path/to/metrics \
+      metrics_summary_period_s:=5.0
 ```
 
 ## Architecture
@@ -91,8 +105,24 @@ flowchart LR
 
 ## Current Status
 
-- Implemented: configurable path publication, path tracking, kinematic simulation, odometry, TF, manual RViz visualization, and a checked-in RViz config
-- Missing: metrics logging and trajectory smoothing
+- Implemented: configurable path publication, path tracking, kinematic simulation, odometry, TF, manual RViz visualization, a checked-in RViz config, and CSV-backed controller/planner metrics logging
+- Missing: trajectory smoothing, velocity profiling, and packaged metrics plotting
+
+## Metrics
+
+The launch path starts a metrics logger by default.
+
+- Controller metrics topic: `/metrics/controller`
+- Planner metrics topic: `/metrics/planner`
+- Default CSV output directory: `metrics_logs/`
+- Default summary log period: `2.0` seconds
+
+The metrics logger writes:
+
+- `metrics_logs/controller_metrics.csv`
+- `metrics_logs/planner_metrics.csv`
+
+The controller metrics CSV currently includes cross-track error, heading error, steering command, steering oscillation, commanded speed, curvature, control latency, lookahead distance, target point, and path size. The planner metrics CSV includes frame id, waypoint count, publish interval, and loop rate.
 
 ## Documentation
 
@@ -104,5 +134,5 @@ flowchart LR
 ## Future Work
 
 - Add trajectory smoothing and velocity profiling
-- Add logging and plots for tracking metrics
+- Add plotting or packaged analysis outputs for tracking metrics
 - Clean up package metadata and runtime interfaces

@@ -148,7 +148,7 @@ class VehicleSimNode(Node):
         self.commanded_speed = msg.linear.x
         self.commanded_steering = msg.angular.z
 
-        self.get_logger().info(
+        self.get_logger().debug(
             f"cmd received: speed={self.commanded_speed:.2f}, "
             f"steering={self.commanded_steering:.2f}, "
             f"raw: linear.x={msg.linear.x:.2f}, angular.z={msg.angular.z:.2f}"
