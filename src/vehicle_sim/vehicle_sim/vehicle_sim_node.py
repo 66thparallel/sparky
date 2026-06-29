@@ -146,7 +146,7 @@ class VehicleSimNode(Node):
         """Callback for velocity commands from controller."""
 
         self.commanded_speed = msg.linear.x
-        self.commanded_steering = max(-0.6, min(0.6, msg.angular.z))
+        self.commanded_steering = msg.angular.z
 
         self.get_logger().info(
             f"cmd received: speed={self.commanded_speed:.2f}, "

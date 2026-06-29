@@ -16,6 +16,7 @@ class ControllerNode(Node):
         self.lookahead_dist = 0.8
         self.k_steer = 1.5
         self.max_speed = 1.0
+        self.max_steering_angle = 0.6
 
         # ros i/o
         self.pub = self.create_publisher(Twist, '/cmd_drive', 10)
@@ -107,7 +108,10 @@ class ControllerNode(Node):
 
         cmd = Twist()
         cmd.linear.x = self.max_speed * (1.0 - min(abs(alpha), 1.0))
-        cmd.angular.z = self.k_steer * curvature
+        cmd.angular.z = max(
+            -self.max_steering_angle,
+            min(self.max_steering_angle, self.k_steer * curvature),
+        )
 
         return cmd, alpha, curvature
 
