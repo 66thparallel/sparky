@@ -88,7 +88,6 @@ map
 ```
 
 ## Architectural Notes
-- The implemented runtime graph is simpler than the older repository design notes.
 - The current planner publishes a configurable waypoint path directly; there is no trajectory smoothing or separate planning stage yet.
 - `vehicle_sim` consumes `/cmd_drive` as its single command input.
 - Launch and RViz assets now live under `src/path_planner` and provide a reproducible demo path.
@@ -97,10 +96,10 @@ map
 ## Suggested Near-Term Target Architecture
 If the repo is brought in line with the original notes, the next stable architecture would likely be:
 
-1. route or waypoint source,
-2. path or trajectory generation,
-3. tracking controller,
-4. vehicle simulator,
-5. launch and visualization assets that wire the system together.
+1. Route or waypoint source
+2. Path or trajectory generation
+3. Tracking controller
+4. Vehicle simulator
+5. Launch and visualization assets that wire the system together
 
-That would restore the intended separation between path generation, planning, control, and plant simulation while keeping the current package boundaries mostly intact.
+This would restore the intended separation between path generation, planning, control, and plant simulation while keeping the current package boundaries mostly intact.

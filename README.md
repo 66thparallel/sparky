@@ -9,6 +9,7 @@ The current workspace implements a minimum viable closed loop:
 - `controller` tracks that path from `/odom` using a Pure Pursuit-style controller
 - `vehicle_sim` simulates a kinematic bicycle model and publishes odometry plus TF
 - `vehicle_description` provides the URDF asset for visualization
+- `metrics_logger` subscribes to planner and controller telemetry and writes CSV summaries
 
 ## Quick Start
 
@@ -21,29 +22,31 @@ colcon build
 source install/setup.bash
 ```
 
-Run the current nodes in separate terminals:
+Run the current nodes in three separate terminals:
 
 ```sh
 ros2 run path_planner path_planner_node
+
 ros2 run controller controller_node
+
 ros2 run vehicle_sim vehicle_sim_node
 ```
 
-Use the checked-in YAML route file:
+Use the YAML planner route file to start the **path_planner** node:
 
 ```sh
 ros2 run path_planner path_planner_node --ros-args \
       --params-file $(ros2 pkg prefix path_planner)/share/path_planner/config/default_route.yaml
 ```
 
-Override the planner route from the command line with flattened `x, y` waypoint pairs:
+Aternatively, you can override the planner route from the command line with your own flattened `x, y` waypoint pairs. For example:
 
 ```sh
 ros2 run path_planner path_planner_node --ros-args \
       -p waypoints:="[0.0, 0.0, 3.0, 0.0, 3.0, 1.5, 0.0, 1.5, 0.0, 0.0]"
 ```
 
-Manual RViz visualization works today:
+Manually start the RViz visualization:
 
 ```sh
 rviz2
@@ -52,7 +55,7 @@ ros2 run robot_state_publisher robot_state_publisher \
       -p robot_description:="$(cat $(ros2 pkg prefix vehicle_description)/share/vehicle_description/urdf/vehicle.urdf)"
 ```
 
-Reusable RViz config:
+Or run this reusable RViz config:
 
 ```sh
 rviz2 -d $(ros2 pkg prefix path_planner)/share/path_planner/rviz/sparky.rviz
@@ -64,7 +67,7 @@ Launch the stack with the default route file:
 ros2 launch path_planner sparky.launch.py
 ```
 
-Launch the stack without the metrics logger:
+Optional: Launch the stack without the metrics logger
 
 ```sh
 ros2 launch path_planner sparky.launch.py enable_metrics:=false
@@ -92,6 +95,7 @@ Current packages in `src/`:
 - `controller`: subscribes to `/path` and `/odom`, publishes `/cmd_drive`
 - `vehicle_sim`: subscribes to `/cmd_drive`, publishes `/odom`, broadcasts TF
 - `vehicle_description`: installs the vehicle URDF asset
+- `metrics_logger`: subscribes to `/metrics/controller` and `/metrics/planner`, writes CSV logs
 
 Runtime flow:
 
@@ -100,6 +104,8 @@ flowchart LR
       A[path_planner_node] -->|/path| B[controller_node]
       B -->|/cmd_drive| C[vehicle_sim_node]
       C -->|/odom| B
+      A -->|/metrics/planner| E[metrics_logger_node]
+      B -->|/metrics/controller| E
       C -->|TF: map -> odom -> base_link| D[Visualization]
 ```
 
@@ -135,4 +141,4 @@ The controller metrics CSV currently includes cross-track error, heading error, 
 
 - Add trajectory smoothing and velocity profiling
 - Add plotting or packaged analysis outputs for tracking metrics
-- Clean up package metadata and runtime interfaces
+- Extend route ingestion beyond parameter files and keep historical notes aligned with the current runtime
