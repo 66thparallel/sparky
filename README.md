@@ -32,33 +32,33 @@ ros2 run controller controller_node
 ros2 run vehicle_sim vehicle_sim_node
 ```
 
-Use the YAML planner route file to start the **path_planner** node:
+In another terminal, use the YAML planner route file to start the **path_planner** node:
 
 ```sh
 ros2 run path_planner path_planner_node --ros-args \
       --params-file $(ros2 pkg prefix path_planner)/share/path_planner/config/default_route.yaml
 ```
 
-Aternatively, you can override the planner route from the command line with your own flattened `x, y` waypoint pairs. For example:
+You can also run your own `x, y` waypoint pairs. For example:
 
 ```sh
 ros2 run path_planner path_planner_node --ros-args \
       -p waypoints:="[0.0, 0.0, 3.0, 0.0, 3.0, 1.5, 0.0, 1.5, 0.0, 0.0]"
 ```
 
-Manually start the RViz visualization:
+Start the RViz visualization (with RViz configuration file):
+
+```sh
+rviz2 -d $(ros2 pkg prefix path_planner)/share/path_planner/rviz/sparky.rviz
+```
+
+Or start RViz and the robot state publisher separately:
 
 ```sh
 rviz2
 ros2 run robot_state_publisher robot_state_publisher \
       --ros-args \
       -p robot_description:="$(cat $(ros2 pkg prefix vehicle_description)/share/vehicle_description/urdf/vehicle.urdf)"
-```
-
-Or run this reusable RViz config:
-
-```sh
-rviz2 -d $(ros2 pkg prefix path_planner)/share/path_planner/rviz/sparky.rviz
 ```
 
 Launch the stack with the default route file:
@@ -73,15 +73,15 @@ Optional: Launch the stack without the metrics logger
 ros2 launch path_planner sparky.launch.py enable_metrics:=false
 ```
 
-Swap routes by pointing launch at another YAML file:
+Optional: Swap routes by pointing launch to your own YAML file. 
+First, stop the terminal running ''ros2 launch path_planner sparky.launch.py''. Then run the following:
 
 ```sh
 ros2 launch path_planner sparky.launch.py \
       route_config:=/absolute/path/to/your_route.yaml
 ```
 
-Override the metrics output directory or summary period:
-
+Optional: Change the metrics logger settings
 ```sh
 ros2 launch path_planner sparky.launch.py \
       metrics_log_dir:=/absolute/path/to/metrics \
