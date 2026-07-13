@@ -142,3 +142,6 @@ The controller metrics CSV currently includes cross-track error, heading error, 
 - Add trajectory smoothing and velocity profiling
 - Add plotting or packaged analysis outputs for tracking metrics
 - Extend route ingestion beyond parameter files and keep historical notes aligned with the current runtime
+
+## Additional Portfolio
+Work-related projects: www.github.com/janeliu-slac
