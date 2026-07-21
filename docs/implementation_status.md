@@ -14,7 +14,7 @@ Sparky is currently in MVP-in-progress state. The core closed loop, launch wirin
 | RViz visualization | Implemented | RViz can display the moving vehicle when the runtime nodes, `robot_state_publisher`, and RViz are started manually or via the checked-in config. |
 | Vehicle description | Partial | URDF exists, but it is currently a minimal box model only. |
 | Route ingestion | Partial | `path_planner_node` accepts waypoint input through ROS parameters or a launch-selected YAML file at startup, but there is no richer external route ingestion pipeline yet. |
-| Trajectory generation | Missing | No smoothing, time parameterization, or velocity profile generation is implemented. |
+| Trajectory generation | Missing | No smoothing, time parameterization, or velocity profile generation is implemented; polynomial trajectories or splines will need to be added to create a smooth, feasible motion plan that the Sparky vehicle can actually execute. |
 | Launch orchestration | Partial | `path_planner/launch/sparky.launch.py` starts `vehicle_sim_node`, `controller_node`, `path_planner_node`, `robot_state_publisher`, and `metrics_logger`, but RViz is still started separately. |
 | RViz configuration asset | Implemented | `path_planner/rviz/sparky.rviz` provides a reusable workspace config for the current stack. |
 | Metrics and logging | Partial | Controller and planner metrics topics are published, `metrics_logger` writes CSV files plus periodic summaries, and the launch path starts the logger by default; plots and deeper analysis outputs are still missing. |
@@ -60,3 +60,5 @@ Sparky is currently in MVP-in-progress state. The core closed loop, launch wirin
 1. Add plotting or packaged analysis outputs on top of the current CSV metrics pipeline.
 2. Extend configurable waypoint input into richer route ingestion or planning if the project grows beyond the current parameter-driven route source.
 3. Continue aligning any remaining historical notes with the current `path_planner`-based runtime.
+4. Add an A* path planning algorithm so Sparky can generate search-based routes instead of only replaying parameterized waypoint paths.
+5. Add polynomial trajectories or spline-based smoothing and time parameterization so the path can be turned into a feasible motion plan for execution.
